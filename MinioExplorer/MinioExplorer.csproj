@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>minio.ico</ApplicationIcon>
+	<PublishSingleFile>true</PublishSingleFile>
+	<Authors>Hou Longchao</Authors>
+	<Description>Minio文件管理器</Description>
+	<Copyright>Hou Longchao</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="minio.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Minio" Version="4.0.2" />
+  </ItemGroup>
+
+</Project>
