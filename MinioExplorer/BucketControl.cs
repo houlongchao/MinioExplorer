@@ -77,6 +77,10 @@ namespace MinioExplorer
         /// <param name="paths"></param>
         private void UploadFile(string[] paths)
         {
+            if (paths.Length <= 0)
+            {
+                return;
+            }
             Task.Run(() =>
             {
                 try
@@ -87,34 +91,45 @@ namespace MinioExplorer
                         currentDir = _dirStack.Peek();
                     }
 
+                    var allFiles = new List<string>();
                     foreach (var path in paths)
                     {
-                        var dir = Path.GetDirectoryName(path);
                         var files = GetAllFiles(path);
-                        int index = 0;
-                        int maxIndex = files.Count;
-                        foreach (var file in files)
-                        {
-                            ++index;
-                            var objectName = currentDir + file.Substring(dir.Length + 1).Replace('\\', '/');
-                            var fileLength = new FileInfo(file).Length;
-                            var max = Math.Ceiling(fileLength / (1024.0 * 1024 * 10));
-                            var message = $"正在上传({index}/{maxIndex}):{objectName}";
-                            
-                            var putObjectArgs = new PutObjectArgs().WithBucket(_minioSetting.Bucket).WithObject(objectName).WithFileName(file);
+                        allFiles.AddRange(files);
+                    }
 
-                            UpdateProgress(0, (int)max, message);
-                            
+                    var dir = Path.GetDirectoryName(paths[0]);
+
+                    int index = 0;
+                    int maxIndex = allFiles.Count;
+                    foreach (var file in allFiles)
+                    {
+                        ++index;
+                        var objectName = currentDir + file.Substring(dir.Length + 1).Replace('\\', '/');
+                        var message = $"正在上传({index}/{maxIndex}):{objectName}";
+
+                        var putObjectArgs = new PutObjectArgs().WithBucket(_minioSetting.Bucket).WithObject(objectName).WithFileName(file);
+
+                        if (allFiles.Count == 1)
+                        {
+                            var fileLength = new FileInfo(file).Length;
+                            maxIndex = (int)Math.Ceiling(fileLength / (1024.0 * 1024 * 10));
+                            UpdateProgress(0, maxIndex, message);
+
                             _minio.SetTraceOn(new MinioRequestLogger()
                             {
                                 PartLogAction = part =>
                                 {
-                                    UpdateProgress(part, (int)max, message);
+                                    UpdateProgress(part, maxIndex, message);
                                 }
                             });
-                            _minio.PutObjectAsync(putObjectArgs).Wait();
-                            UpdateProgress((int)max, (int)max, message);
                         }
+                        else
+                        {
+                            UpdateProgress(index, maxIndex, message);
+                        }
+                        
+                        _minio.PutObjectAsync(putObjectArgs).Wait();
                     }
 
                     LoadFiles(tss_currentDir.Text);
@@ -230,8 +245,7 @@ namespace MinioExplorer
                     Directory.CreateDirectory(dir);
 
                     var message = $"正在下载({index}/{maxIndex}):{itemObj.Key}";
-                    ShowProgress(message);
-
+                    UpdateProgress(index, maxIndex, message);
                     GetObjectArgs args = new GetObjectArgs()
                                                         .WithBucket(_minioSetting.Bucket)
                                                         .WithObject(itemObj.Key)
@@ -303,8 +317,6 @@ namespace MinioExplorer
             tsp_progress.Value = value;
             tsp_progress.Available = true;
             tsp_progress.Visible = true;
-
-            statusStrip.Invalidate();
         }
 
         /// <summary>
