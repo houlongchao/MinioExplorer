@@ -74,6 +74,7 @@ namespace MinioExplorer
             this.dgv_main.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgv_main_CellMouseDown);
             this.dgv_main.DragDrop += new System.Windows.Forms.DragEventHandler(this.dgv_main_DragDrop);
             this.dgv_main.DragEnter += new System.Windows.Forms.DragEventHandler(this.dgv_main_DragEnter);
+            this.dgv_main.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgv_main_MouseDown);
             // 
             // txt_type
             // 

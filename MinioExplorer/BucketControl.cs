@@ -439,6 +439,10 @@ namespace MinioExplorer
                 {
                     selectedRow.Selected = false;
                 }
+                if (e.RowIndex < 0)
+                {
+                    return;
+                }
                 var row = dgv_main.Rows[e.RowIndex];
                 row.Selected = true;
                 var menu = new ContextMenuStrip();
@@ -456,6 +460,21 @@ namespace MinioExplorer
                     }
                 };
                 menu.Items.Add(btnDownload);
+                dgv_main.ContextMenuStrip = menu;
+            }
+        }
+
+        private void dgv_main_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var menu = new ContextMenuStrip();
+
+                var btnRefresh = menu.Items.Add("刷新");
+                btnRefresh.Click += (s, e) => {
+                    LoadFiles(tss_currentDir.Text);
+                };
+                menu.Items.Add(btnRefresh);
                 dgv_main.ContextMenuStrip = menu;
             }
         }
