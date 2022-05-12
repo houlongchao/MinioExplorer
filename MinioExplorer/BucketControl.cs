@@ -371,7 +371,7 @@ namespace MinioExplorer
             tss_dirCount.Text = "目录:" + items.Where(t => t.IsDir).Count();
             foreach (var item in items)
             {
-                var rowIndex = dgv_main.Rows.Add(item.IsDir ? "目录" : "文件", item.Key, item.LastModifiedDateTime, item.IsDir ? null : item.Size / 1024.0, item.IsDir ? "进入" : "下载");
+                var rowIndex = dgv_main.Rows.Add(item.IsDir ? "目录" : "文件", item.Key, item.LastModifiedDateTime, item.IsDir ? null : Math.Ceiling(item.Size / 1024.0) / 1024.0, item.IsDir ? "进入" : "下载");
                 var row = dgv_main.Rows[rowIndex];
                 if (item.IsDir)
                 {
@@ -445,7 +445,6 @@ namespace MinioExplorer
                 };
                 menu.Items.Add(btnDownload);
                 dgv_main.ContextMenuStrip = menu;
-
             }
         }
     }

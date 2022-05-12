@@ -28,7 +28,7 @@ namespace MinioExplorer
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgv_main = new System.Windows.Forms.DataGridView();
             this.txt_type = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.txt_name = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -101,10 +101,10 @@ namespace MinioExplorer
             // 
             // txt_fileSize
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.Format = "0.000 KB";
-            dataGridViewCellStyle2.NullValue = null;
-            this.txt_fileSize.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle1.Format = "0.000 MB";
+            dataGridViewCellStyle1.NullValue = null;
+            this.txt_fileSize.DefaultCellStyle = dataGridViewCellStyle1;
             this.txt_fileSize.HeaderText = "大小";
             this.txt_fileSize.MinimumWidth = 6;
             this.txt_fileSize.Name = "txt_fileSize";
