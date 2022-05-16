@@ -1,4 +1,4 @@
-using Minio;
+﻿using Minio;
 using Minio.DataModel;
 using Minio.Exceptions;
 using System.Diagnostics;
@@ -85,11 +85,7 @@ namespace MinioExplorer
             {
                 try
                 {
-                    var currentDir = "";
-                    if (_dirStack.Any())
-                    {
-                        currentDir = _dirStack.Peek();
-                    }
+                    var currentDir = tss_currentDir.Text;
 
                     var allFiles = new List<string>();
                     foreach (var path in paths)
