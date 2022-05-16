@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -11,6 +11,7 @@
 	<Authors>Hou Longchao</Authors>
 	<Description>Minio文件管理器</Description>
 	<Copyright>Hou Longchao</Copyright>
+	<Version>1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

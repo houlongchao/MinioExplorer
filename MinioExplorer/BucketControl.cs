@@ -50,7 +50,7 @@ namespace MinioExplorer
         }
 
         /// <summary>
-        /// 价格指定目录文件列表
+        /// 加载指定目录文件列表
         /// </summary>
         /// <param name="dir"></param>
         private void LoadFiles(string dir = "")
@@ -90,7 +90,7 @@ namespace MinioExplorer
                     var allFiles = new List<string>();
                     foreach (var path in paths)
                     {
-                        var files = GetAllFiles(path);
+                        var files = GetAllLocalFiles(path);
                         allFiles.AddRange(files);
                     }
 
@@ -143,11 +143,11 @@ namespace MinioExplorer
         }
 
         /// <summary>
-        /// 获取指定minio路径下的所有文件
+        /// 获取指定本地路径下的所有文件
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private List<string> GetAllFiles(string path)
+        private List<string> GetAllLocalFiles(string path)
         {
             var result = new List<string>();
 
@@ -163,10 +163,17 @@ namespace MinioExplorer
 
             foreach (var item in Directory.GetDirectories(path))
             {
-                result.AddRange(GetAllFiles(item));
+                result.AddRange(GetAllLocalFiles(item));
             }
 
             return result;
+        }
+
+        private IList<Item> GetAllMinioFiles(string path)
+        {
+            var listObjectsArgs = new ListObjectsArgs().WithBucket(_minioSetting.Bucket).WithPrefix(path).WithRecursive(true);
+            var items = _minio.ListObjectsAsync(listObjectsArgs).ToList().Wait();
+            return items;
         }
 
         /// <summary>
@@ -222,8 +229,7 @@ namespace MinioExplorer
         {
             try
             {
-                var listObjectsArgs = new ListObjectsArgs().WithBucket(_minioSetting.Bucket).WithPrefix(item.Key).WithRecursive(true);
-                var items = _minio.ListObjectsAsync(listObjectsArgs).ToList().Wait();
+                var items = GetAllMinioFiles(item.Key);
                 int index = 0;
                 int maxIndex = items.Count;
                 foreach (var itemObj in items)
@@ -261,6 +267,31 @@ namespace MinioExplorer
                 HideProgress();
             }
 
+        }
+
+        private async void DeleteItem(Item item)
+        {
+            try
+            {
+                if (item.IsDir)
+                {
+                    var items = GetAllMinioFiles(item.Key);
+                    var files = items.Select(t => t.Key).ToList();
+                    var removeObjectsArgs = new RemoveObjectsArgs().WithBucket(_minioSetting.Bucket).WithObjects(files);
+                    await _minio.RemoveObjectsAsync(removeObjectsArgs);
+                }
+                else
+                {
+                    var removeObjectArgs = new RemoveObjectArgs().WithBucket(_minioSetting.Bucket).WithObject(item.Key);
+                    await _minio.RemoveObjectAsync(removeObjectArgs);
+                }
+                
+                LoadFiles(tss_currentDir.Text);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
         /// <summary>
@@ -441,10 +472,11 @@ namespace MinioExplorer
                 }
                 var row = dgv_main.Rows[e.RowIndex];
                 row.Selected = true;
+                var item = row.Tag as Item;
+
                 var menu = new ContextMenuStrip();
 
                 var btnDownload = menu.Items.Add("下载");
-                var item = row.Tag as Item;
                 btnDownload.Click += (s, e) => {
                     if (item.IsDir)
                     {
@@ -456,6 +488,16 @@ namespace MinioExplorer
                     }
                 };
                 menu.Items.Add(btnDownload);
+
+                if (_minioSetting.CanDelete)
+                {
+                    var btnDelete = menu.Items.Add("删除");
+                    btnDelete.Click += (s, e) => {
+                        DeleteItem(item);
+                    };
+                    menu.Items.Add(btnDelete);
+                }
+                
                 dgv_main.ContextMenuStrip = menu;
             }
         }

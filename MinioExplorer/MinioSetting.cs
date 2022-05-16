@@ -1,4 +1,4 @@
-namespace MinioExplorer
+﻿namespace MinioExplorer
 {
     public class MinioSetting
     {
@@ -6,5 +6,7 @@ namespace MinioExplorer
         public string AccessKey { get; set; } = "";
         public string SecretKey { get; set; } = "";
         public string Bucket { get; set; } = "";
+
+        public bool CanDelete { get; set; } = false;
     }
 }
